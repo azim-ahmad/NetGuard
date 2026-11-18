@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NetGuard - Scan History</title>
+
+    <style>
+        body {
+            background: #101827;
+            color: white;
+            font-family: Arial;
+            padding: 30px;
+        }
+
+        .panel {
+            background: #1d2b3d;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid #405064;
+            text-align: left;
+        }
+
+        th {
+            color: #55C6A5;
+        }
+
+        a {
+            color: #55C6A5;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>NetGuard - Scan History</h1>
+
+<div class="panel">
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Target</th>
+            <th>Scan Date</th>
+            <th>Action</th>
+        </tr>
+
+        {% for scan in scans %}
+        <tr>
+            <td>{{ scan.id }}</td>
+            <td>{{ scan.target }}</td>
+            <td>{{ scan.scan_time }}</td>
+            <td>
+                <a href="/history/{{ scan.id }}">View Details</a>
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+    {% if not scans %}
+    <p>No scan history available.</p>
+    {% endif %}
+
+</div>
+
+<br>
+
+<a href="/">← Back to Dashboard</a>
+
+</body>
+</html>

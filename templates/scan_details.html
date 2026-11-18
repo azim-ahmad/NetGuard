@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NetGuard - Scan Details</title>
+
+    <style>
+        body {
+            background: #101827;
+            color: white;
+            font-family: Arial;
+            padding: 30px;
+        }
+
+        .card {
+            background: #1d2b3d;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        h1, h2 {
+            color: #55C6A5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #405064;
+            text-align: left;
+        }
+
+        .High {
+            color: #ff6b6b;
+        }
+
+        .Medium {
+            color: #ffd166;
+        }
+
+        .Info {
+            color: #55c6a5;
+        }
+
+        a {
+            color: #55C6A5;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Scan Details</h1>
+
+<div class="card">
+    <p><b>Scan ID:</b> {{ scan.id }}</p>
+    <p><b>Target:</b> {{ scan.target }}</p>
+    <p><b>Scan Date:</b> {{ scan.scan_time }}</p>
+</div>
+
+{% for host in results %}
+
+<div class="card">
+
+    <h2>Host: {{ host.ip }}</h2>
+
+    <h3>Open Ports</h3>
+
+    <table>
+        <tr>
+            <th>Port</th>
+            <th>Protocol</th>
+            <th>Service</th>
+            <th>Version</th>
+        </tr>
+
+        {% for port in host.ports %}
+        <tr>
+            <td>{{ port.port }}</td>
+            <td>{{ port.protocol }}</td>
+            <td>{{ port.service }}</td>
+            <td>{{ port.version }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4">No open ports found.</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+    <h3>Security Findings</h3>
+
+    {% for finding in host.findings %}
+    <p class="{{ finding.level }}">
+        <b>{{ finding.level }}:</b>
+        {{ finding.message }}
+    </p>
+    {% else %}
+    <p>No security findings recorded.</p>
+    {% endfor %}
+
+</div>
+
+{% else %}
+<div class="card">
+    <p>No active hosts were found in this scan.</p>
+</div>
+{% endfor %}
+
+<br>
+
+<a href="/history">← Back to Scan History</a>
+
+</body>
+</html>

@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NetGuard | Security Scanner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            background: #101827;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 25px;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: auto;
+        }
+
+        .panel {
+            background: #1d2b3d;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        input {
+            padding: 12px;
+            width: 60%;
+            border-radius: 6px;
+            border: 0;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #1685c5;
+            color: white;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td, th {
+            padding: 12px;
+            border-bottom: 1px solid #405064;
+            text-align: left;
+        }
+
+        .error {
+            color: #ff8585;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: #101827;
+            padding: 18px;
+            border-radius: 10px;
+        }
+
+        .stat-card h2 {
+            margin-bottom: 5px;
+        }
+
+        .chart-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        .chart-label {
+            width: 75px;
+        }
+
+        .bar-bg {
+            flex: 1;
+            background: #101827;
+            height: 16px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            border-radius: 10px;
+        }
+
+        .chart-value {
+            width: 25px;
+            text-align: right;
+        }
+
+        .action-link {
+            display: inline-block;
+            background: #1685c5;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin: 10px 10px 10px 0;
+        }
+
+        a {
+            color: #55C6A5;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            input {
+                width: 90%;
+                margin-bottom: 10px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            td, th {
+                padding: 8px 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🛡️ NetGuard</h1>
+    <p>Network Discovery & Security Assessment</p>
+
+    <div class="panel">
+        <h2>Start Network Scan</h2>
+
+        <form method="POST">
+            <input
+                name="target"
+                placeholder="Example: 192.168.56.0/24"
+                value="{{ target }}"
+                required
+            >
+
+            <button type="submit">Scan Network</button>
+        </form>
+
+        <p>Use only your authorized private lab network.</p>
+    </div>
+
+    {% if error %}
+    <div class="panel error">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    {% if results is not none %}
+
+    <div class="panel">
+
+        <h2>Scan Results</h2>
+
+        <div class="stats">
+
+            <div class="stat-card">
+                <h2>{{ total_hosts }}</h2>
+                <p>Active Hosts</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>{{ total_ports }}</h2>
+                <p>Open Ports</p>
+            </div>
+
+            <div class="stat-card">
+                <h2 style="color:#ff6666">
+                    {{ risk_counts.High }}
+                </h2>
+                <p>High Risk Findings</p>
+            </div>
+
+            <div class="stat-card">
+                <h2 style="color:#e5b85c">
+                    {{ risk_counts.Medium }}
+                </h2>
+                <p>Medium Risk Findings</p>
+            </div>
+
+        </div>
+
+        <h2>Risk Distribution</h2>
+
+        {% set total_risks = risk_counts.High + risk_counts.Medium + risk_counts.Info %}
+
+        {% for level, color in [
+            ('High', '#ff6666'),
+            ('Medium', '#e5b85c'),
+            ('Info', '#55C6A5')
+        ] %}
+
+        {% set count = risk_counts[level] %}
+        {% set percentage = (count * 100 / total_risks) if total_risks > 0 else 0 %}
+
+        <div class="chart-row">
+
+            <div class="chart-label">{{ level }}</div>
+
+            <div class="bar-bg">
+                <div
+                    class="bar"
+                    style="width:{{ percentage }}%; background:{{ color }};"
+                ></div>
+            </div>
+
+            <div class="chart-value">{{ count }}</div>
+
+        </div>
+
+        {% endfor %}
+
+        <a href="/download" class="action-link">
+            Download Security Report
+        </a>
+
+        <a href="/history" class="action-link">
+            View Scan History
+        </a>
+
+        <h2>Active Hosts: {{ results|length }}</h2>
+
+        {% for host in results %}
+
+        <h3>IP Address: {{ host.ip }}</h3>
+
+        <table>
+            <tr>
+                <th>Port</th>
+                <th>Protocol</th>
+                <th>Service</th>
+                <th>Version</th>
+            </tr>
+
+            {% for port in host.ports %}
+            <tr>
+                <td>{{ port.port }}</td>
+                <td>{{ port.protocol }}</td>
+                <td>{{ port.service }}</td>
+                <td>{{ port.version }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No open ports found.</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+
+        <h3>Security Assessment</h3>
+
+        {% for finding in host.findings %}
+
+        <div class="stat-card" style="margin:10px 0;">
+
+            <strong>{{ finding.service }}</strong>
+
+            <span style="color:#55C6A5">
+                {{ finding.level }}
+            </span>
+
+            <p>Port: {{ finding.port }}</p>
+            <p>{{ finding.message }}</p>
+
+        </div>
+
+        {% else %}
+        <p>No security findings recorded.</p>
+        {% endfor %}
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
