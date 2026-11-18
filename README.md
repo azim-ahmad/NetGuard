@@ -99,9 +99,19 @@ For local testing:
 ```text
 127.0.0.1/32
 ```
-## 📸 Dashboard Preview
+## 📸 Screenshots
 
-![NetGuard Dashboard](screenshots/dashboard.png)
+### 1. Main Dashboard
+![NetGuard Dashboard](screenshots/screenshot1.png)
+
+### 2. Scan Results
+![Scan Results](screenshots/screenshot2.png)
+
+### 3. Security Assessment
+![Security Assessment](screenshots/screenshot3.png)
+
+### 4. Scan History
+![Scan History](screenshots/screenshot4.png)
 ## 📊 Project Structure
 
 ```text
