@@ -99,7 +99,9 @@ For local testing:
 ```text
 127.0.0.1/32
 ```
+## 📸 Dashboard Preview
 
+![NetGuard Dashboard](screenshots/dashboard.png)
 ## 📊 Project Structure
 
 ```text
